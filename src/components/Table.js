@@ -1,19 +1,20 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import DataTable from "react-data-table-component";
 import { Button } from "reactstrap";
 import { useData } from "../utils/useData";
 import AddForm from "./AddForm";
 import EditForm from "./EditForm";
 
-function Table() {
+function Table({ dataForTable }) {
   const [showForm, setShowForm] = useState(false);
   const [showEdit, setShowEdit] = useState(false);
   const [editValues, setEditValues] = useState({});
 
-  const data = useData((state) => state.data);
+  // const data = useData((state) => state.data);
+  const data = dataForTable;
   const loading = useData((state) => state.loading);
   const hasErrors = useData((state) => state.hasErrors);
-  const fetchAllCitizens = useData((state) => state.fetch);
+  // const fetchAllCitizens = useData((state) => state.fetch);
   // const fetchOneCitizen = useData((state) => state.fetchOne);
   // const addCitizen = useData((state) => state.createCitizen);
   // const editCitizen = useData((state) => state.editCitizen);
@@ -64,9 +65,9 @@ function Table() {
     deleteCitizen(id);
   };
 
-  useEffect(() => {
-    fetchAllCitizens();
-  }, [fetchAllCitizens]);
+  // useEffect(() => {
+  //   fetchAllCitizens();
+  // }, [fetchAllCitizens]);
 
   if (loading) {
     return <p>Loading...</p>;
