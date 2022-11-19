@@ -1,7 +1,6 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { Form, FormGroup, Label, Input, Button } from "reactstrap";
 import styled from "styled-components";
-import { useData } from "../utils/useData";
 
 const Wrapper = styled.div`
   max-width: 744px;
@@ -20,7 +19,9 @@ const CloseBtn = styled.div`
   justify-content: flex-end;
 `;
 
-export default function AddForm({ onClick, id }) {
+export default function AddForm({ onClick, citizensLength }) {
+  console.log(citizensLength, "lll");
+  const [id, setId] = useState(citizensLength);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [gender, setGender] = useState("male");
@@ -28,22 +29,34 @@ export default function AddForm({ onClick, id }) {
   const [street, setStreet] = useState("");
   const [phone, setPhone] = useState("");
 
-  const addCitizen = useData((state) => state.createCitizen);
+  const handleSubmit = useCallback(async () => {
+    try {
+      const response = await fetch("/citizens", {
+        method: "POST",
+        body: JSON.stringify({
+          id: id,
+          name: name,
+          email: email,
+          gender: gender,
+          address: {
+            street: street,
+            city: city,
+          },
+          phone: phone,
+        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      const json = await response.json();
 
-  const handleSubmit = (e) => {
-    // e.preventDefault();
-    addCitizen({
-      id: id,
-      name: name,
-      email: email,
-      gender: gender,
-      address: {
-        street: street,
-        city: city,
-      },
-      phone: phone,
-    });
-  };
+      if (!response.ok) {
+        console.log(json.message);
+      }
+    } catch (e) {
+      console.log(e?.message ?? "Something went wrong");
+    }
+  }, [id, name, email, gender, city, street, phone]);
   return (
     <Wrapper>
       <CloseBtn>
@@ -53,6 +66,18 @@ export default function AddForm({ onClick, id }) {
       </CloseBtn>
       <Form onSubmit={handleSubmit}>
         <FormGroup>
+          <Label for="exampleId">Id</Label>
+          <Input
+            id="exampleId"
+            name="id"
+            value={id}
+            onChange={(e) => setId(e.target.value)}
+            placeholder="Full id..."
+            type="text"
+            required
+          />
+        </FormGroup>
+        <FormGroup>
           <Label for="exampleName">Name</Label>
           <Input
             id="exampleName"
@@ -60,7 +85,7 @@ export default function AddForm({ onClick, id }) {
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="Full name..."
-            type="name"
+            type="text"
             required
           />
         </FormGroup>
@@ -122,7 +147,7 @@ export default function AddForm({ onClick, id }) {
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
             placeholder="Phone..."
-            type="number"
+            type="text"
             required
           />
         </FormGroup>
