@@ -20,7 +20,6 @@ const CloseBtn = styled.div`
 `;
 
 export default function AddForm({ onClick, citizensLength }) {
-  
   const [id, setId] = useState(citizensLength);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -72,7 +71,7 @@ export default function AddForm({ onClick, citizensLength }) {
             name="id"
             value={id}
             onChange={(e) => setId(e.target.value)}
-            placeholder="Full id..."
+            placeholder="Full id.."
             type="text"
             required
           />

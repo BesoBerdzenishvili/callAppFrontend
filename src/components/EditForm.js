@@ -1,7 +1,6 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { Form, FormGroup, Label, Input, Button } from "reactstrap";
 import styled from "styled-components";
-import { useData } from "../utils/useData";
 
 const Wrapper = styled.div`
   max-width: 744px;
@@ -20,8 +19,7 @@ const CloseBtn = styled.div`
   justify-content: flex-end;
 `;
 
-export default function EditForm({ onClick, id, editValues }) {
-  console.log(editValues);
+export default function EditForm({ onClick, editValues }) {
   const [name, setName] = useState(editValues.name);
   const [email, setEmail] = useState(editValues.email);
   const [gender, setGender] = useState(editValues.gender);
@@ -29,22 +27,34 @@ export default function EditForm({ onClick, id, editValues }) {
   const [street, setStreet] = useState(editValues.address.street);
   const [phone, setPhone] = useState(editValues.phone);
 
-  const editCitizen = useData((state) => state.editCitizen);
+  const handleSubmit = useCallback(async () => {
+    try {
+      const response = await fetch(`/citizens/${editValues._id}`, {
+        method: "PUT",
+        body: JSON.stringify({
+          id: editValues.id,
+          name: name,
+          email: email,
+          gender: gender,
+          address: {
+            street: street,
+            city: city,
+          },
+          phone: phone,
+        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      const json = await response.json();
 
-  const handleSubmit = (e) => {
-    // e.preventDefault();
-    editCitizen(editValues._id, {
-      id: id,
-      name: name,
-      email: email,
-      gender: gender,
-      address: {
-        street: street,
-        city: city,
-      },
-      phone: phone,
-    });
-  };
+      if (!response.ok) {
+        console.log(json.message);
+      }
+    } catch (e) {
+      console.log(e?.message ?? "Something went wrong");
+    }
+  }, [editValues._id, editValues.id, name, email, gender, city, street, phone]);
   return (
     <Wrapper>
       <CloseBtn>
