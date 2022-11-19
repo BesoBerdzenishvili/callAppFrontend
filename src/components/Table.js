@@ -10,17 +10,15 @@ function Table({ dataForTable }) {
   const [showEdit, setShowEdit] = useState(false);
   const [editValues, setEditValues] = useState({});
 
-  // const data = useData((state) => state.data);
   const data = dataForTable;
   const loading = useData((state) => state.loading);
   const hasErrors = useData((state) => state.hasErrors);
-  // const fetchAllCitizens = useData((state) => state.fetch);
-  // const fetchOneCitizen = useData((state) => state.fetchOne);
-  // const addCitizen = useData((state) => state.createCitizen);
-  // const editCitizen = useData((state) => state.editCitizen);
-  const deleteCitizen = useData((state) => state.deleteCitizen);
 
   const columns = [
+    {
+      name: "id",
+      selector: (row) => row.id,
+    },
     {
       name: "Name",
       selector: (row) => row.name,
@@ -61,13 +59,25 @@ function Table({ dataForTable }) {
     setShowEdit(true);
   };
 
-  const handleDelete = (id) => {
-    deleteCitizen(id);
-  };
+  const handleDelete = async (id) => {
+    try {
+      const response = await fetch(`/citizens/${id}`, {
+        method: "DELETE",
+        body: JSON.stringify(),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      const json = await response.json();
 
-  // useEffect(() => {
-  //   fetchAllCitizens();
-  // }, [fetchAllCitizens]);
+      if (!response.ok) {
+        console.log(json.message);
+      }
+    } catch (e) {
+      console.log(e?.message ?? "Something went wrong");
+    }
+    window.location.reload(false);
+  };
 
   if (loading) {
     return <p>Loading...</p>;
@@ -81,7 +91,9 @@ function Table({ dataForTable }) {
       <Button color="success" onClick={() => setShowForm(true)}>
         ADD
       </Button>
-      {showForm && <AddForm onClick={setShowForm} id={data.length} />}
+      {showForm && (
+        <AddForm onClick={setShowForm} citizensLength={data.length} />
+      )}
       {showEdit && <EditForm onClick={setShowEdit} editValues={editValues} />}
       <DataTable
         columns={columns}
