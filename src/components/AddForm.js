@@ -20,7 +20,7 @@ const CloseBtn = styled.div`
 `;
 
 export default function AddForm({ onClick, citizensLength }) {
-  console.log(citizensLength, "lll");
+  
   const [id, setId] = useState(citizensLength);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
